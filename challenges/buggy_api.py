@@ -2,17 +2,21 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-# این سرویس قرار است موجودی را مدیریت کند
+# Service manages user account balance
 balance = 100
 
 @app.route('/checkout', methods=['POST'])
 def checkout():
+    """
+    Challenge: Logical Vulnerability
+    - Business Logic Flaw: Does not validate if 'amount' is positive.
+    - Security Flaw: Allows balance to drop below zero, leading to negative assets.
+    """
     data = request.json
     amount = data.get('amount', 0)
     
-    # باگ منطقی: در اینجا بررسی نمی‌شود که آیا مقدار amount منفی است یا خیر
-    # و باگ پنهان: اگر کاربر موجودی کافی نداشته باشد، تعادل منفی می‌شود که باید Disputed شود
     global balance
+    # Logic Error: Insufficient funds check is missing.
     balance -= amount
     
     return jsonify({"new_balance": balance, "status": "processed"})
